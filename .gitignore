@@ -1,0 +1,24 @@
+node_modules
+
+# env
+.env
+server/.env
+
+# node modules
+server/node_modules
+client/node_modules
+
+# package-lock
+server/package-lock.json
+client/package-lock.json
+
+# build
+dist
+
+# exe file
+server-win.exe
+
+
+# distributores
+server-linux
+server-macos
