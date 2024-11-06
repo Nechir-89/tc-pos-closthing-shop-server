@@ -34,7 +34,7 @@ export const update_item_state_service = async (model: Omit<ItemState, 'item_sta
 
   try {
     const query = `UPDATE ${process.env.DB_SCHEMA}.items_state 
-                    SET total_available_units = (SELECT total_available_units FROM ${process.env.DB_SCHEMA}.items_state WHERE item_id = $<item_id>) + $<total_available_units>, 
+                    SET total_available_units = 0, 
                         total_available_pcs = (SELECT total_available_pcs FROM ${process.env.DB_SCHEMA}.items_state WHERE item_id = $<item_id>) + $<total_available_pcs> 
                     WHERE item_id = $<item_id> 
                     RETURNING item_state_id`;

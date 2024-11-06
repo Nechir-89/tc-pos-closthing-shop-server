@@ -7,7 +7,8 @@ export type Invoice = {
   gifted_amount?: number,
   paid_price: number,
   invoice_price: number,
-  invoice_cost: number
+  invoice_cost: number,
+  invoice_type?: string
 }
 
 export type InvoiceItem = {
@@ -31,5 +32,6 @@ export type InvoiceRequestBody = {
   invoice_cost: number,
   payment_method_id: number,
   user_id: number,
-  items: InvoiceItem[]
+  items: InvoiceItem[],
+  invoice_type?: string
 }

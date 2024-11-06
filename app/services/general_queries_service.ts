@@ -6,23 +6,17 @@ export const search_last_stock_barcode_service = async (barcode: string) => {
     const query = `SELECT 
     stocking.*, 
     items.*, 
-    units.unit_name, 
     categories.category_name, 
-    pcs_units.pc_unit_name, 
     items_state.total_available_units, 
     items_state.total_available_pcs 
   FROM 
     ${process.env.DB_SCHEMA}.stocking,
     ${process.env.DB_SCHEMA}.items,
-    ${process.env.DB_SCHEMA}.units,
     ${process.env.DB_SCHEMA}.categories,
-    ${process.env.DB_SCHEMA}.pcs_units,
     ${process.env.DB_SCHEMA}.items_state 
   WHERE 
     stocking.item_id = items.item_id
-    and items.unit_id = units.unit_id
     and items.category_id = categories.category_id
-    and items.pc_unit_id = pcs_units.pc_unit_id
     and items.item_id = items_state.item_id
     and ( stocking.barcode = $<barcode> or stocking.pc_barcode = $<barcode> ) 
 

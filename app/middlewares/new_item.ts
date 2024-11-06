@@ -28,19 +28,18 @@ export const new_item: RequestHandler<
 
   try {
     const item = await add_item_service(itemData)
+
     if (item?.item_id) {
+
       const stockData: Stock = {
-        amount_in_units: req.body.amount_in_units,
+        amount_in_pcs: req.body.amount_in_pcs,
         expire_date: req.body.expire_date,
         production_date: req.body.production_date,
         item_id: item.item_id,
         stocking_note: req.body.stocking_note,
         pc_cost: req.body.pc_cost,
         pc_price: req.body.pc_price,
-        unit_cost: req.body.unit_cost,
-        unit_price: req.body.unit_price,
         user_id: req.body.user_id,
-        barcode: req.body.barcode,
         pc_barcode: req.body.pc_barcode,
       }
 
@@ -50,9 +49,9 @@ export const new_item: RequestHandler<
           const stateData: StockState = {
             item_id: item.item_id,
             stocking_id: stock.stocking_id,
-            current_units: stockData.amount_in_units,
-            current_pcs: stockData.amount_in_units * itemData.pcs_per_unit,
-            pcs_per_unit: itemData.pcs_per_unit,
+            current_units: 0,
+            current_pcs: stockData.amount_in_pcs,
+            pcs_per_unit: 0,
             solid_units: 0,
             solid_pcs: 0,
             // total cost of sold pcs and units
@@ -76,12 +75,12 @@ export const new_item: RequestHandler<
               await delete_stock_service(stock.stocking_id)
               await delete_item_service(item.item_id)
               console.log(`There is an error with stock state id ${state?.state_id}`);
-              res.status(500).json({ error: "Error" });
+              res.status(500).json({ error: "Error: adding stock state" });
             } else {
               const itemStateData: Omit<ItemState, 'item_state_id'> = {
                 item_id: item.item_id,
                 total_available_pcs: stateData.current_pcs,
-                total_available_units: stateData.current_units
+                total_available_units: 0
               }
               try {
                 const itemState = await add_item_state_service(itemStateData)
@@ -90,7 +89,7 @@ export const new_item: RequestHandler<
                   await delete_stock_service(stock.stocking_id)
                   await delete_item_service(item.item_id)
                   console.log(`There is an error with item state id ${itemState?.item_state_id}`);
-                  res.status(500).json({ error: "Error" });
+                  res.status(500).json({ error: "Error: adding item state" });
                 }
                 
                 res.status(201).json({ message: 'New item added' });
@@ -107,7 +106,7 @@ export const new_item: RequestHandler<
           // roll back and delete item
           await delete_item_service(item.item_id)
           console.log(`There is an error with stocking_id ${stock?.stocking_id}`);
-          res.status(500).json({ error: "Error" });
+          res.status(500).json({ error: "Error: adding stock" });
         }
       } catch (error) {
         console.log(`server is running into an error \n ${error}`);
@@ -115,7 +114,7 @@ export const new_item: RequestHandler<
       }
     } else {
       console.log(`There is an error with item_id ${item?.item_id}`);
-      res.status(500).json({ error: "Error" });
+      res.status(500).json({ error: "Error: adding item" });
     }
   } catch (error) {
     console.log(`server is running into an error \n ${error}`);

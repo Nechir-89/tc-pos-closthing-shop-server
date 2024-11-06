@@ -6,7 +6,7 @@ import {
   update_stock_expire_date_service,
   update_stock_barcodes_service,
   delete_stock_service_2,
-  update_stock_amount_in_units_service,
+  update_stock_amount_in_pcs_service,
   update_stock_cost_and_price_service
 } from '../services/stocks_service'
 import { Stock } from '../../types/Stock.types';
@@ -96,7 +96,6 @@ export const update_stock_barcodes: RequestHandler<
   Response,
   {
     stocking_id: number,
-    barcode: string | null,
     pc_barcode: string | null
   },
   never
@@ -104,7 +103,6 @@ export const update_stock_barcodes: RequestHandler<
   try {
     const respond = await update_stock_barcodes_service(
       req.body.stocking_id,
-      req.body.barcode,
       req.body.pc_barcode
     );
     // http response code for update either going to be 200 or 204 (no content)
@@ -115,28 +113,26 @@ export const update_stock_barcodes: RequestHandler<
   }
 }
 
-export const update_stock_amount_in_units: RequestHandler<
+export const update_stock_amount_in_pcs: RequestHandler<
   never,
   Response,
   {
     item_id: number,
     stocking_id: number,
     state_id: number,
-    newtotalQuantityInUnits: number,
-    old_quantity_in_units: number,
-    newCurrentUnits: number,
+    newAmountInPcs: number,
+    old_quantity_in_pcs: number,
     newCurrentPcs: number
   },
   never
 > = async (req, res: Response) => {
   try {
-    const respond = await update_stock_amount_in_units_service(
+    const respond = await update_stock_amount_in_pcs_service(
       req.body.item_id,
       req.body.stocking_id,
       req.body.state_id,
-      req.body.newtotalQuantityInUnits,
-      req.body.old_quantity_in_units,
-      req.body.newCurrentUnits,
+      req.body.newAmountInPcs,
+      req.body.old_quantity_in_pcs,
       req.body.newCurrentPcs,
     );
     // http response code for update either going to be 200 or 204 (no content)
@@ -152,8 +148,6 @@ export const update_stock_cost_and_price: RequestHandler<
   Response,
   {
     stocking_id: number,
-    unit_cost: number,
-    unit_price: number,
     pc_cost: number,
     pc_price: number
   },
@@ -162,8 +156,6 @@ export const update_stock_cost_and_price: RequestHandler<
   try {
     const respond = await update_stock_cost_and_price_service(
       req.body.stocking_id,
-      req.body.unit_cost,
-      req.body.unit_price,
       req.body.pc_cost,
       req.body.pc_price,
     );

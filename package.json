@@ -1,6 +1,6 @@
 {
   "name": "tc-pos-single-pt",
-  "version": "2.15.2",
+  "version": "3.0.0",
   "description": "Web API Server for Single Point POS System",
   "main": "server.ts",
   "scripts": {

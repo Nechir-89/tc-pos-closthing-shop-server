@@ -17,9 +17,13 @@ export const add_item_service = async (model: Item) => {
   console.log(`Creating new item ${model.item_name}`)
 
   try {
+    // const query = `INSERT INTO ${process.env.DB_SCHEMA}.items 
+    // (item_name, pcs_per_unit, user_id, category_id, item_note, unit_id, archived, pc_unit_id) 
+    // VALUES($<item_name>, $<pcs_per_unit>, $<user_id>, $<category_id>, $<item_note>, $<unit_id>, $<archived>, $<pc_unit_id>) 
+    // RETURNING item_id`;
     const query = `INSERT INTO ${process.env.DB_SCHEMA}.items 
-    (item_name, pcs_per_unit, user_id, category_id, item_note, unit_id, archived, pc_unit_id) 
-    VALUES($<item_name>, $<pcs_per_unit>, $<user_id>, $<category_id>, $<item_note>, $<unit_id>, $<archived>, $<pc_unit_id>) 
+    (item_name, user_id, category_id, archived) 
+    VALUES($<item_name>, $<user_id>, $<category_id>, $<archived>) 
     RETURNING item_id`;
     const respond = await db.one(query, model);
     console.log(`Passed: item ${model.item_name} created`)

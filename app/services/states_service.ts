@@ -33,6 +33,23 @@ export const get_nonzero_stock_states_by_item_id_service = async (item_id: numbe
   }
 }
 
+export const get_stock_states_by_item_id_service = async (item_id: number) => {
+  console.log(`Looking all stock states for item ${item_id}`);
+  try {
+    const respond = await db.any(`SELECT * 
+    FROM ${process.env.DB_SCHEMA}.stocks_state 
+    WHERE item_id = $<item_id> 
+    ORDER BY state_id ASC`, { item_id });
+
+    console.log(`Passed: all stock states found for item ${item_id}`);
+
+    return respond;
+  } catch (error) {
+    console.log(`Failed: Looking all stock states for item ${item_id} ==> ${error}`);
+    return ({ error: `DB error` });
+  }
+}
+
 export const add_stock_state_service = async (model: Omit<StockState, 'state_id'>) => {
   console.log(`Creating new stock state for item id ${model.item_id}`)
 
@@ -68,11 +85,11 @@ export const get_stocks_states_docs_service = async () => {
   try {
     const query = `SELECT 
                     stocks_state.*, 
-                    s.unit_cost, s.unit_price, s.pc_cost, s.pc_price, s.barcode, s.pc_barcode, 
-                    s.amount_in_units, s.stocking_note, s.date, s.production_date, s.expire_date, 
+                    s.pc_cost, s.pc_price, 
+                    s.pc_barcode, s.stocking_note, 
+                    s.date, s.production_date, 
+                    s.expire_date, s.amount_in_pcs, 
                     categories.category_name, 
-                    units.unit_name, 
-                    pcs_units.pc_unit_name, 
                     items.item_name, 
                     users.user_name  
                   FROM 
@@ -80,19 +97,15 @@ export const get_stocks_states_docs_service = async () => {
                     ${process.env.DB_SCHEMA}.stocking AS s, 
                     ${process.env.DB_SCHEMA}.items, 
                     ${process.env.DB_SCHEMA}.users, 
-                    ${process.env.DB_SCHEMA}.categories, 
-                    ${process.env.DB_SCHEMA}.units, 
-                    ${process.env.DB_SCHEMA}.pcs_units 
-                  WHERE
+                    ${process.env.DB_SCHEMA}.categories  
+                  WHERE 
                     stocks_state.stocking_id = s.stocking_id 
-                    AND stocks_state.current_pcs > 0
+                    AND stocks_state.current_pcs > 0 
                     AND s.item_id = items.item_id 
                     AND s.user_id = users.user_id 
-                    AND items.category_id = categories.category_id 
-                    AND items.unit_id = units.unit_id 
-                    AND items.pc_unit_id = pcs_units.pc_unit_id  
+                    AND items.category_id = categories.category_id  
+                    ORDER BY stocks_state.state_id DESC`;
 
-                  ORDER BY stocks_state.state_id DESC`
     const respond = await db.any(query);
     console.log(`Passed: all stocks states documents found`);
     return respond;
@@ -107,30 +120,30 @@ export const get_stocks_states_docs_by_barcode_service = async (barcode: string)
   try {
     const query = `SELECT 
                     stocks_state.*, 
-                    s.unit_cost, s.unit_price, s.pc_cost, s.pc_price, s.barcode, s.pc_barcode, 
-                    s.amount_in_units, s.stocking_note, s.date, s.production_date, s.expire_date, 
+                    s.pc_cost, s.pc_price, 
+                    s.pc_barcode, s.stocking_note, 
+                    s.date, s.production_date, 
+                    s.expire_date, s.amount_in_pcs, 
                     categories.category_name, 
-                    units.unit_name, 
-                    pcs_units.pc_unit_name, 
                     items.item_name, 
                     users.user_name 
+
                   FROM 
                     ${process.env.DB_SCHEMA}.stocks_state, 
                     ${process.env.DB_SCHEMA}.stocking AS s, 
                     ${process.env.DB_SCHEMA}.items, 
                     ${process.env.DB_SCHEMA}.users, 
-                    ${process.env.DB_SCHEMA}.categories, 
-                    ${process.env.DB_SCHEMA}.units, 
-                    ${process.env.DB_SCHEMA}.pcs_units 
-                  WHERE
+                    ${process.env.DB_SCHEMA}.categories 
+
+                  WHERE 
                     stocks_state.stocking_id = s.stocking_id 
                     AND s.item_id = items.item_id 
                     AND s.user_id = users.user_id 
-                    AND items.category_id = categories.category_id 
-                    AND items.unit_id = units.unit_id 
-                    AND items.pc_unit_id = pcs_units.pc_unit_id  
+                    AND items.category_id = categories.category_id  
                     AND (s.barcode = $<barcode> OR s.pc_barcode = $<barcode>) 
-                  ORDER BY stocks_state.state_id DESC`
+                  
+                    ORDER BY stocks_state.state_id DESC`;
+                    
     const respond = await db.any(query, { barcode });
     console.log(`Passed: all stocks states documents for barcode ${barcode} found`);
     return respond;

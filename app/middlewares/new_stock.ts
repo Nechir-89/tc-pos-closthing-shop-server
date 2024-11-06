@@ -9,23 +9,20 @@ import { update_item_state_service } from "../services/items_state_service";
 export const new_stock: RequestHandler<
   never,
   Response,
-  Stock & { pcs_per_unit: number },
+  Stock,
   never
 > = async (req, res: Response) => {
 
+  // first add new stock
   const stockData: Stock = {
-    amount_in_units: req.body.amount_in_units,
+    amount_in_pcs: req.body.amount_in_pcs,
     expire_date: req.body.expire_date,
-    production_date: req.body.production_date,
     item_id: req.body.item_id,
     stocking_note: req.body.stocking_note,
     pc_cost: req.body.pc_cost,
     pc_price: req.body.pc_price,
-    unit_cost: req.body.unit_cost,
-    unit_price: req.body.unit_price,
     user_id: req.body.user_id,
-    barcode: req.body.barcode,
-    pc_barcode: req.body.pc_barcode,
+    pc_barcode: req.body.pc_barcode
   }
 
   try {
@@ -35,9 +32,9 @@ export const new_stock: RequestHandler<
       const stateData: StockState = {
         item_id: req.body.item_id,
         stocking_id: stock.stocking_id,
-        current_units: stockData.amount_in_units,
-        current_pcs: stockData.amount_in_units * req.body.pcs_per_unit,
-        pcs_per_unit: req.body.pcs_per_unit,
+        current_units: 0,
+        current_pcs: stockData.amount_in_pcs,
+        pcs_per_unit: 0,
         solid_units: 0,
         solid_pcs: 0,
         // total cost/price of sold pcs and units
@@ -55,6 +52,7 @@ export const new_stock: RequestHandler<
       }
 
       try {
+        // second add new stock state
         const state = await add_stock_state_service(stateData)
         if (!state.state_id) {
           // roll back and delete item and stock
@@ -66,9 +64,10 @@ export const new_stock: RequestHandler<
           const itemStateData: Omit<ItemState, 'item_state_id'> = {
             item_id: req.body.item_id,
             total_available_pcs: stateData.current_pcs,
-            total_available_units: stateData.current_units
+            total_available_units: 0
           }
           try {
+            // finally update item state
             const itemState = await update_item_state_service(itemStateData)
             if (!itemState?.item_state_id) {
               await delete_stock_state_service(state?.state_id)
