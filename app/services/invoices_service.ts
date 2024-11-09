@@ -434,7 +434,7 @@ export const total_profit_service = async () => {
   try {
     const query = `SELECT COUNT(*), SUM(paid_price) as total_price, 
                     SUM(invoice_cost) as total_cost, SUM(gifted_amount) as total_gifted  
-                    FROM ${process.env.DB_SCHEMA}.invoices `;
+                    FROM ${process.env.DB_SCHEMA}.invoices WHERE invoice_type='sale'`;
     const response = await db.one(query);
     console.log(`Passed: found sum of total price and total cost`);
     return response;
@@ -452,7 +452,8 @@ export const total_profit_for_today_service = async () => {
     const query = `SELECT COUNT(*), SUM(paid_price) as total_price, 
                     SUM(invoice_cost) as total_cost, SUM(gifted_amount) as total_gifted 
                     FROM ${process.env.DB_SCHEMA}.invoices 
-                    WHERE invoice_date > CURRENT_DATE `;
+                    WHERE invoice_date > CURRENT_DATE 
+                    AND invoice_type='sale'`;
     const response = await db.one(query);
     console.log(`Passed: found sum of total price and total cost for today`);
     return response;
@@ -468,7 +469,8 @@ export const total_profit_for_last_week_service = async () => {
     const query = `SELECT COUNT(*), SUM(paid_price) as total_price, 
                     SUM(invoice_cost) as total_cost, SUM(gifted_amount) as total_gifted 
                     FROM ${process.env.DB_SCHEMA}.invoices 
-                    WHERE invoice_date > CURRENT_DATE - 7`;
+                    WHERE invoice_date > (CURRENT_DATE - 7) 
+                    AND invoice_type='sale'`;
     const response = await db.one(query);
     console.log(
       `Passed: found sum of total price and total cost for last week`
@@ -486,7 +488,8 @@ export const total_profit_for_last_month_service = async () => {
     const query = `SELECT COUNT(*), SUM(paid_price) as total_price, 
                     SUM(invoice_cost) as total_cost, SUM(gifted_amount) as total_gifted 
                     FROM ${process.env.DB_SCHEMA}.invoices 
-                    WHERE invoice_date > CURRENT_DATE - 30`;
+                    WHERE invoice_date > (CURRENT_DATE - 30) 
+                    AND invoice_type='sale'`;
     const response = await db.one(query);
     console.log(
       `Passed: found sum of total price and total cost for last month`

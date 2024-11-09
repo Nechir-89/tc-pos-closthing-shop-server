@@ -21,11 +21,13 @@ like
 1. Shop expenses (rent, electericity, cashier, and other expenses)
 
 ### VERSION 1.1.0
-This minor version introduces return items feature
-invoices type can be either "sale" or "return"
-"sale" for saling items
-"return" for returning invoices
+- This minor version introduces return items feature
+  invoices type can be either "sale" or "return"
+  "sale" for saling items
+  "return" for returning invoices
 
-client side expected to pass invoice type to server so it can handle request
-
+- client side expected to pass invoice type to server so it can handle request
+- check out readme file in client side
+- giffeted amoun will represent gifft amount if invoice is Sale
+- giffeted amoun will represent cut amount if invoice is Return
 
