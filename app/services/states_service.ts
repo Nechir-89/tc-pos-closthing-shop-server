@@ -39,7 +39,7 @@ export const get_stock_states_by_item_id_service = async (item_id: number) => {
     const respond = await db.any(`SELECT * 
     FROM ${process.env.DB_SCHEMA}.stocks_state 
     WHERE item_id = $<item_id> 
-    ORDER BY state_id ASC`, { item_id });
+    ORDER BY state_id DESC`, { item_id });
 
     console.log(`Passed: all stock states found for item ${item_id}`);
 
