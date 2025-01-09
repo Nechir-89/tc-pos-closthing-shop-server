@@ -480,74 +480,31 @@ export const search_invoice_documents_service = async (where: string) => {
   }
 };
 
-export const total_profit_service = async () => {
-  console.log(`Getting total of profit from beginnign to this moment`);
+export const profit_day_based_service = async (days: number) => {
+  console.log(`\nLooking for profite in last ${days} days \n`);
   try {
-    const query = `SELECT COUNT(*), SUM(paid_price) as total_price, 
-                    SUM(invoice_cost) as total_cost, SUM(gifted_amount) as total_gifted  
-                    FROM ${process.env.DB_SCHEMA}.invoices WHERE invoice_type='sale'`;
-    const response = await db.one(query);
-    console.log(`Passed: found sum of total price and total cost`);
-    return response;
-  } catch (error) {
-    console.log(
-      `Failed: getting total of profit from beginnign to this moment ==> ${error}`
-    );
-    return { error: `DB error` };
-  }
-};
+    const query = `SELECT invoice_type, 
+                          COUNT(*), 
+                          SUM(paid_price) as paid_price, 
+                          SUM(invoice_cost) as cost, 
+                          SUM(gifted_amount) as gifted 
 
-export const total_profit_for_today_service = async () => {
-  console.log(`Getting total of profit for today`);
-  try {
-    const query = `SELECT COUNT(*), SUM(paid_price) as total_price, 
-                    SUM(invoice_cost) as total_cost, SUM(gifted_amount) as total_gifted 
-                    FROM ${process.env.DB_SCHEMA}.invoices 
-                    WHERE invoice_date > CURRENT_DATE 
-                    AND invoice_type='sale'`;
-    const response = await db.one(query);
-    console.log(`Passed: found sum of total price and total cost for today`);
-    return response;
-  } catch (error) {
-    console.log(`Failed: getting total of profit for today ==> ${error}`);
-    return { error: `DB error` };
-  }
-};
-
-export const total_profit_for_last_week_service = async () => {
-  console.log(`Getting total of profit for last week`);
-  try {
-    const query = `SELECT COUNT(*), SUM(paid_price) as total_price, 
-                    SUM(invoice_cost) as total_cost, SUM(gifted_amount) as total_gifted 
-                    FROM ${process.env.DB_SCHEMA}.invoices 
-                    WHERE invoice_date > (CURRENT_DATE - 7) 
-                    AND invoice_type='sale'`;
-    const response = await db.one(query);
+                    FROM tc_pos_clothing_shop_schema.invoices 
+                    ${
+                      days !== -1 ?
+                      `WHERE invoice_date > (CURRENT_DATE - ${Number(days)})`
+                      : ""
+                    }  
+                    GROUP BY invoice_type;`;
+    // note: -1 means from start day to last day of business
+    const response = await db.any(query);
     console.log(
-      `Passed: found sum of total price and total cost for last week`
+      `Passed: found sum of paid price (return price), cost, and gifted (cut) for last ${days}`
     );
+    // response && console.log(response)
     return response;
   } catch (error) {
-    console.log(`Failed: getting total of profit for last week ==> ${error}`);
-    return { error: `DB error` };
-  }
-};
-
-export const total_profit_for_last_month_service = async () => {
-  console.log(`Getting total of profit for last month`);
-  try {
-    const query = `SELECT COUNT(*), SUM(paid_price) as total_price, 
-                    SUM(invoice_cost) as total_cost, SUM(gifted_amount) as total_gifted 
-                    FROM ${process.env.DB_SCHEMA}.invoices 
-                    WHERE invoice_date > (CURRENT_DATE - 30) 
-                    AND invoice_type='sale'`;
-    const response = await db.one(query);
-    console.log(
-      `Passed: found sum of total price and total cost for last month`
-    );
-    return response;
-  } catch (error) {
-    console.log(`Failed: getting total of profit for last month ==> ${error}`);
+    console.log(`Failed: looking for profit for last ${days} ==> ${error}`);
     return { error: `DB error` };
   }
 };

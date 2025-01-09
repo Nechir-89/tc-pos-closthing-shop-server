@@ -6,10 +6,7 @@ import {
   get_invoice_document_by_offset_service,
   get_last_200_invoice_documents_service,
   search_invoice_documents_service,
-  total_profit_for_last_month_service,
-  total_profit_for_last_week_service,
-  total_profit_for_today_service,
-  total_profit_service,
+  profit_day_based_service
 } from "../services/invoices_service";
 
 export const add_invoice: RequestHandler<
@@ -91,62 +88,19 @@ export const search_invoice_documents: RequestHandler<
   }
 };
 
-export const total_profit: RequestHandler<
+export const profit_day_based: RequestHandler<
   never,
   Response,
-  never,
+  { days: number }, // number of days for finding profit
   never
 > = async (req, res: Response) => {
   try {
-    const respond = await total_profit_service();
-    res.status(200).json(respond);
+    const respond = await profit_day_based_service(Number(req.body.days));
+    respond && res.status(200).json(respond);
   } catch (error) {
-    console.log(`server is running into an error \n ${error}`);
-    res.status(500).json({ error: "Server error" });
-  }
-};
-
-export const total_profit_of_day: RequestHandler<
-  never,
-  Response,
-  never,
-  never
-> = async (req, res: Response) => {
-  try {
-    const respond = await total_profit_for_today_service();
-    res.status(200).json(respond);
-  } catch (error) {
-    console.log(`server is running into an error \n ${error}`);
-    res.status(500).json({ error: "Server error" });
-  }
-};
-
-export const total_profit_of_last_week: RequestHandler<
-  never,
-  Response,
-  never,
-  never
-> = async (req, res: Response) => {
-  try {
-    const respond = await total_profit_for_last_week_service();
-    res.status(200).json(respond);
-  } catch (error) {
-    console.log(`server is running into an error \n ${error}`);
-    res.status(500).json({ error: "Server error" });
-  }
-};
-
-export const total_profit_of_last_month: RequestHandler<
-  never,
-  Response,
-  never,
-  never
-> = async (req, res: Response) => {
-  try {
-    const respond = await total_profit_for_last_month_service();
-    res.status(200).json(respond);
-  } catch (error) {
-    console.log(`server is running into an error \n ${error}`);
+    console.log(
+      `server is running into an error while running profit based on days \n ${error}`
+    );
     res.status(500).json({ error: "Server error" });
   }
 };
