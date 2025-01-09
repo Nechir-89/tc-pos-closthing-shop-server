@@ -33,7 +33,7 @@ export const add_invoice_and_items_service = async (
   try {
     // insert invoice
     const resp = await insert_invoice_service({
-      invoice_cost: model.invoice_cost, 
+      invoice_cost: model.invoice_cost,
       invoice_date: model.invoice_date,
       invoice_price: model.invoice_price, // total price or returned money
       // if this is a returned invoice (paid_price column) will represent returned money to customer
@@ -380,6 +380,7 @@ export const get_invoice_documents_service = async () => {
   }
 };
 
+// get single invoice
 export const get_invoice_document_by_offset_service = async (
   offset: number
 ) => {
@@ -425,6 +426,56 @@ export const get_invoice_document_by_invoice_id_service = async (
     return response;
   } catch (error) {
     console.log(`Failed: getting invoice document by invoice id ==> ${error}`);
+    return { error: `DB error` };
+  }
+};
+
+export const get_last_200_invoice_documents_service = async () => {
+  console.log(`Getting 200 invoice documents`);
+  try {
+    const query = `SELECT invoices.*, 
+                        users.user_name, users.role, 
+                        payment_methods.payment_method_name 
+                        
+                    FROM ${process.env.DB_SCHEMA}.invoices,
+                          ${process.env.DB_SCHEMA}.users,
+                          ${process.env.DB_SCHEMA}.payment_methods 
+                    WHERE invoices.user_id = users.user_id 
+                        AND invoices.payment_method_id = payment_methods.payment_method_id
+
+                    ORDER BY invoices.invoice_id DESC 
+                    LIMIT 200 `;
+    const response = await db.any(query);
+    console.log(`Passed: found last 200 invoice documents`);
+    return response;
+  } catch (error) {
+    console.log(`Failed: getting 200 invoice documents ==> ${error}`);
+    return { error: `DB error` };
+  }
+};
+
+export const search_invoice_documents_service = async (where: string) => {
+  console.log(`Searching invoice documents`);
+
+  try {
+    const query = `SELECT invoices.*, 
+                        users.user_name, users.role, 
+                        payment_methods.payment_method_name 
+                        
+                    FROM ${process.env.DB_SCHEMA}.invoices,
+                          ${process.env.DB_SCHEMA}.users,
+                          ${process.env.DB_SCHEMA}.payment_methods 
+                    WHERE invoices.user_id = users.user_id 
+                        AND invoices.payment_method_id = payment_methods.payment_method_id 
+                        ${where} 
+
+                    ORDER BY invoices.invoice_id DESC 
+                    LIMIT 200 `;
+    const response = await db.any(query);
+    console.log(`Passed: found invoice documents`);
+    return response;
+  } catch (error) {
+    console.log(`Failed: Searching for invoice documents ==> ${error}`);
     return { error: `DB error` };
   }
 };
