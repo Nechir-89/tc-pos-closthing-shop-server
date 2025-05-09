@@ -16,11 +16,12 @@ webserver.use(routes);
 
 const port = 5002;
 webserver.listen(port, () => {
-  console.log(`TC POS Single Point Server`);
-  console.log(`SERVER VERSION: ${process.env.SERVER_VERSION}`);
+  console.log(`\n-----------------------------`);
+  console.log(new Date().toDateString());
+  console.log(`Name: Clothing Shop POS System`);
+  console.log(`VERSION: ${process.env.SERVER_VERSION}`);
   console.log(`AUTHOR: ${process.env.AUTHOR}`);
-  // console.log(`RELEASED DATE: MARCH 04, 2024`);
+  console.log(`RELEASED DATE: Jan 10, 2025`);
   console.log(`SERVER PORT: ${port}`);
-  console.log(`-----------------------------`);
-  console.log();
+  console.log(`-----------------------------\n`);
 })

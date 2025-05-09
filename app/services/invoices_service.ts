@@ -489,7 +489,7 @@ export const profit_day_based_service = async (days: number) => {
                           SUM(invoice_cost) as cost, 
                           SUM(gifted_amount) as gifted 
 
-                    FROM tc_pos_clothing_shop_schema.invoices 
+                    FROM ${process.env.DB_SCHEMA}.invoices 
                     ${
                       days !== -1 ?
                       `WHERE invoice_date > (CURRENT_DATE - ${Number(days)})`
