@@ -2,7 +2,7 @@ import { NextFunction, Request, RequestHandler, Response } from "express";
 
 export const cors: RequestHandler = (req: Request, res: Response, next: NextFunction): void => {
   const origin = req.headers.origin;
-  
+
   res.setHeader("Access-Control-Allow-Origin", origin || "*");
   res.setHeader(
     "Access-Control-Allow-Methods",
@@ -14,5 +14,11 @@ export const cors: RequestHandler = (req: Request, res: Response, next: NextFunc
     "Access-Control-Allow-Headers",
     "Origin, X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept"
   );
+
+  if (req.method === "OPTIONS") {
+    res.status(204).end(); // Respond with no content for preflight requests
+    return;
+  }
+
   next();
-}
+};
