@@ -15,6 +15,7 @@ import invoices_router from "./invoices_routes";
 import non_scan_router from "./non_scan_router";
 import payment_methods_router from "./payment_methods_router";
 import reports_router from "./reports_router";
+import software_registration_router from "./software_registration_router";
 
 const router = Router();
 
@@ -54,5 +55,8 @@ router.use("/api/payment_methods", payment_methods_router);
 // reports
 
 router.use("/api/reports", reports_router);
+
+// software registration
+router.use("/api/software_registration", software_registration_router);
 
 export default router;
