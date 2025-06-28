@@ -16,9 +16,7 @@ export const get_stocks_service = async () => {
   }
 };
 
-export const get_stock_by_stocking_id_service = async (
-  stocking_id: number
-) => {
+export const get_stock_by_stocking_id_service = async (stocking_id: number) => {
   console.log(`Looking for stock ${stocking_id}`);
   try {
     const respond = await db.one(
@@ -29,6 +27,76 @@ export const get_stock_by_stocking_id_service = async (
     return respond;
   } catch (error) {
     console.log(`Failed: Looking stocks ==> ${error}`);
+    return { error: `DB error` };
+  }
+};
+
+export const get_stock_discounts_service = async (stocking_id: number) => {
+  console.log(`Looking for stock discounts${stocking_id}`);
+  try {
+    const respond = await db.any(
+      `SELECT * FROM ${process.env.DB_SCHEMA}.stock_discount WHERE stock_id=$<stocking_id>`,
+      { stocking_id }
+    );
+    console.log(`Passed: all stocks discount found`);
+    return respond;
+  } catch (error) {
+    console.log(`Failed: Looking stocks discounts ==> ${error}`);
+    return { error: `DB error` };
+  }
+};
+
+export const add_stock_discounts_service = async (
+  stock_id: number,
+  discount_type: string,
+  discount_value: number,
+  price_after_discount: number,
+  user_id: number
+) => {
+  console.log(`Inserting into discounts for stock id ${stock_id}`);
+  try {
+    const respond = await db.any(
+      `INSERT INTO ${process.env.DB_SCHEMA}.stock_discount (stock_id, discount_type, discount_value, price_after_discount, user_id) 
+      VALUES($<stock_id>, $<discount_type>, $<discount_value>, $<price_after_discount>, $<user_id> )`,
+      { stock_id, discount_type, discount_value, price_after_discount, user_id }
+    );
+    console.log(`Passed: stock discount inserted`);
+
+    await db.any(
+      `UPDATE  ${process.env.DB_SCHEMA}.stocking SET has_discount=true WHERE stocking_id=$<stock_id>`,
+      { stock_id }
+    );
+    console.log(`Passed: stock has been updated`);
+    return respond;
+  } catch (error) {
+    console.log(`Failed: inserting stocks discounts ==> ${error}`);
+    return { error: `DB error` };
+  }
+};
+
+export const remove_stock_discounts_service = async (
+  stocking_id: number,
+  all: boolean
+) => {
+  try {
+    let respond;
+    if (all) {
+      console.log(`Taking down discounts for all stocks`);
+      respond = await db.any(
+        `UPDATE  ${process.env.DB_SCHEMA}.stocking SET has_discount=false`
+      );
+      console.log(`Passed: discount removed for all stocks`);
+    } else {
+      console.log(`Taking down discounts from stock id ${stocking_id}`);
+      respond = await db.any(
+        `UPDATE  ${process.env.DB_SCHEMA}.stocking SET has_discount=false WHERE stocking_id=$<stocking_id>`,
+        { stocking_id }
+      );
+      console.log(`Passed: discount removed for stock id ${stocking_id}`);
+    }
+    return respond;
+  } catch (error) {
+    console.log(`Failed: taking down discounts ==> ${error}`);
     return { error: `DB error` };
   }
 };

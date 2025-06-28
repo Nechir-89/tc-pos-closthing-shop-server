@@ -88,7 +88,7 @@ export const get_stocks_states_docs_service = async () => {
                     s.pc_cost, s.pc_price, 
                     s.pc_barcode, s.stocking_note, 
                     s.date, s.production_date, 
-                    s.expire_date, s.amount_in_pcs, 
+                    s.expire_date, s.amount_in_pcs, s.has_discount, 
                     categories.category_name, 
                     items.item_name, 
                     users.user_name  
