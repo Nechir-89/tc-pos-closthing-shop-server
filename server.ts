@@ -21,7 +21,7 @@ webserver.listen(port, () => {
   console.log(`Name: Clothing Shop POS System`);
   console.log(`VERSION: ${process.env.SERVER_VERSION}`);
   console.log(`AUTHOR: ${process.env.AUTHOR}`);
-  console.log(`RELEASED DATE: Jan 10, 2025`);
+  console.log(`RELEASED DATE: July 02, 2025`);
   console.log(`SERVER PORT: ${port}`);
   console.log(`-----------------------------\n`);
 })

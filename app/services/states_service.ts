@@ -123,7 +123,7 @@ export const get_stocks_states_docs_by_barcode_service = async (barcode: string)
                     s.pc_cost, s.pc_price, 
                     s.pc_barcode, s.stocking_note, 
                     s.date, s.production_date, 
-                    s.expire_date, s.amount_in_pcs, 
+                    s.expire_date, s.amount_in_pcs, s.has_discount, 
                     categories.category_name, 
                     items.item_name, 
                     users.user_name 
@@ -160,6 +160,7 @@ export const get_stocks_states_docs_by_item_name_service = async (item_name: str
                     stocks_state.*, 
                     s.unit_cost, s.unit_price, s.pc_cost, s.pc_price, s.barcode, s.pc_barcode, 
                     s.amount_in_units, s.stocking_note, s.date, s.production_date, s.expire_date, 
+                    s.has_discount, 
                     categories.category_name, 
                     units.unit_name, 
                     pcs_units.pc_unit_name, 

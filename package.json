@@ -1,6 +1,6 @@
 {
   "name": "tc-clothing-shop-pos-single-pt",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "description": "Web API Server for clothing shop of Single Point of sale",
   "main": "server.ts",
   "scripts": {

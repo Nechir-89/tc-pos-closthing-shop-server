@@ -22,6 +22,10 @@ export type InvoiceItem = {
   cost: number,
   price: number,
   pcs_per_unit: number
+  has_discount?: boolean;
+  discount_type?: "P" | "A";
+  discount_value?: number;
+  price_after_discount?: number;
 }
 
 export type InvoiceRequestBody = {

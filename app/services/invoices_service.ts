@@ -48,13 +48,30 @@ export const add_invoice_and_items_service = async (
     if (resp?.invoice_id && model.invoice_type === "sale") {
       model.items.forEach(async (item) => {
         // step 1: add invoice item
-        const query = `INSERT INTO ${process.env.DB_SCHEMA}.invoice_items(
+        // console.log(item);
+        let query = "";
+        if (item.has_discount)
+          query = `INSERT INTO ${process.env.DB_SCHEMA}.invoice_items(
+                        invoice_id, item_id, quantity, total_price, 
+                        total_cost, cost, price, has_discount, discount_type, 
+                        discount_value, price_after_discount, original_price) 
+
+                        VALUES ($<invoice_id>, $<item_id>, 
+                        $<quantity>, $<total_price>, $<total_cost>,
+                        $<cost>, $<price>, $<has_discount>, $<discount_type>, 
+                        $<discount_value>, $<price_after_discount>, $<original_price>) 
+
+                        RETURNING invoice_item_id`;
+        else
+          query = `INSERT INTO ${process.env.DB_SCHEMA}.invoice_items(
                         invoice_id, item_id, quantity, total_price, 
                         total_cost, cost, price) 
                         VALUES ($<invoice_id>, $<item_id>, 
                         $<quantity>, $<total_price>, $<total_cost>,
                         $<cost>, $<price>) 
+
                         RETURNING invoice_item_id`;
+
         try {
           const invoiceItemResp = await db.one(query, {
             invoice_id: resp?.invoice_id,
@@ -491,9 +508,11 @@ export const profit_day_based_service = async (days: number) => {
 
                     FROM ${process.env.DB_SCHEMA}.invoices 
                     ${
-                      days !== -1 ?
-                      `WHERE invoice_date > (CURRENT_DATE - ${Number(days)})`
-                      : ""
+                      days !== -1
+                        ? `WHERE invoice_date > (CURRENT_DATE - ${Number(
+                            days
+                          )})`
+                        : ""
                     }  
                     GROUP BY invoice_type;`;
     // note: -1 means from start day to last day of business
